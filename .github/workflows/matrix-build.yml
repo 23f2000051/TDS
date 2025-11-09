@@ -1,0 +1,53 @@
+name: Multi-Platform Matrix Build (Challenge 976aaae)
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    # 💡 Use a matrix to run 3 parallel variants
+    strategy:
+      matrix:
+        node-version: [14, 16, 18]
+    runs-on: ubuntu-latest
+
+    steps:
+      # -----------------------------
+      # Step 1 – Checkout repository
+      # -----------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # -----------------------------
+      # Step 2 – Identifier step (required)
+      # -----------------------------
+      - name: matrix-976aaae
+        run: echo "Building for Node.js version ${{ matrix.node-version }}"
+
+      # -----------------------------
+      # Step 3 – Setup environment
+      # -----------------------------
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # -----------------------------
+      # Step 4 – Simulate build & create unique artifact
+      # -----------------------------
+      - name: Generate build artifact
+        run: |
+          echo "Build output for Node.js version ${{ matrix.node-version }}" > output-${{ matrix.node-version }}.txt
+          echo "Timestamp: $(date)" >> output-${{ matrix.node-version }}.txt
+          echo "Git commit: $GITHUB_SHA" >> output-${{ matrix.node-version }}.txt
+          cat output-${{ matrix.node-version }}.txt
+
+      # -----------------------------
+      # Step 5 – Upload artifact
+      # -----------------------------
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-976aaae-v${{ matrix.node-version }}
+          path: output-${{ matrix.node-version }}.txt
